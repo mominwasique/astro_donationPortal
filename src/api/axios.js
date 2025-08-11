@@ -1,0 +1,19 @@
+import axios from 'axios';
+
+const apiURL = 'https://stage-icharms.tscube.co.in/api/v1'
+const apiToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5ZGMwYjIxNC00ZTFlLTRiNzYtOWUyNC1lZTQyYTE3MWIzNmUiLCJqdGkiOiI1MTBiNzFhOGUzM2M4NTllY2M5NGEyOWY0YTMyZDQ5ODU0NGU4NGMzYmMzMWNlMzdjMDUxNDBjZWUyZDIxOWVmMTUzNDA3Y2IxNjRiYzliYSIsImlhdCI6MTczNDUwOTQ4Ni45NDE0OTIsIm5iZiI6MTczNDUwOTQ4Ni45NDE0OTQsImV4cCI6MTc2NjA0NTQ4Ni45MzgxNDUsInN1YiI6IjIiLCJzY29wZXMiOltdfQ.OurC0wmbxL6LYX4I-cFkxugjgp3HsrqbLg2lz3QEicmyY1SB5a2m9p5KUChR_IEQfyHFcA3Kzyj1bA5DpomJbmej9cm95uXtq67Tz9gsplmVC9TiWryENQFQJLuXbLa8tgoH7XZJkunXyzOtIf9K1PBFbmeftGSCSvLQGk_7PAEsWOqfuN0RHFd6WULc4C8GBmTAKjV944PeaZo7FU-H7_C9XfqK9zeH80QCFIqjPCwv7EjSEQw7DHZ3iZRZIXjcr6yCGP1ZTeNSflly2FgerNqyEPaR5w1RFk-a8dIN-muKcbm3AMJ2-8q7wtW6whoBgani2lbxenBBWfHkzOujGiPQOErxq-BLBYCbWY-v2OQM5W0-XB5Ou1QEm522H-IZIXlb7kA9pMgmOmhn-SuHsY9ga0B5bdn3y0uksPviJOJfGyh_J1zZKi_b_VgKG4GUPZjwTDnUOxFEnuHrNYGJS8h4Es8lU4zRNG8NdtN9O5GTlqwxKc56xpXNEfn0I2G8YGgkvfKWCufoNU6_AXUHATGGSJHALbtU-mMVqxuJHL4Qhollm954t0NVEnNF1CmmpJABp5R4MxdY_3AlgC61w8AoH4KCvBF_JWzrPA0LsUa1B2bE8mJvZGEC6AlluSCGyFGwJBWmbeul_uZvvlONg3R_vSko2QYvzJZfs-khdVc'
+
+console.log(apiURL);
+console.log(apiToken);
+
+
+const api = axios.create({
+  baseURL: apiURL,
+  timeout: 15000,
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiToken}`,
+  },
+});
+
+export default api;
