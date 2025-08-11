@@ -12,7 +12,6 @@ const AmountSelection = ({
   setProgramRateId,
   isLoading,
 }) => {
-  console.log(prevData);
 
   const { selectedCategory, selectedCountry, selectedProgram } = prevData;
 
@@ -93,8 +92,6 @@ const AmountSelection = ({
         selectedAmount || customAmount,
         parseInt(selectedAmount) !== parseInt(programRate?.program_rate?.program_rate)
       );
-
-      window.location.href = '/checkout'
       // Reset submitting state after a delay to allow for API response
       setTimeout(() => {
         setIsSubmitting(false);
