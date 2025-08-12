@@ -38,7 +38,7 @@ const ProgramSelection = ({ category, onBack, setStep, setSelectedProgram, setSe
 
   const handleSelect = (program) => {
     setSelectedProgram(program.program_id);
-    // Skip country selection if program has no countries or is local
+    // Always go to country selection first, let CountrySelection handle the logic
     setSelectedCountry("")
     setStep(4);
   };
