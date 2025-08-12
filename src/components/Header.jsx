@@ -3,12 +3,14 @@ import useSessionId from '../hooks/useSessionId';
 import { LogIn, UserPlus, ShoppingCart, User, LogOut, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getCart } from '../api/cartApi';
+import Cart from './Cart'; // Import the Cart component
 
-const Header = ({ setIsOpen }) => {
+const Header = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const sessionId = useSessionId();
   const [currentPath, setCurrentPath] = useState('');
+  const [isCartOpen, setIsCartOpen] = useState(false); // Add this state
 
   useEffect(() => {
     // Set current path after component mounts to avoid hydration mismatch
@@ -36,8 +38,10 @@ const Header = ({ setIsOpen }) => {
 
   const handleCartClick = (e) => {
     e.preventDefault();
-    setIsOpen(true);
+    setIsCartOpen(true);
   };
+
+  const handleCartClose = () => setIsCartOpen(false); // Close cart handler
 
   const MobileNav = () => (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] border-t border-gray-200 py-4 px-6 z-40">
@@ -79,7 +83,7 @@ const Header = ({ setIsOpen }) => {
         )}
 
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={handleCartClick}
           className="flex flex-col items-center text-grey relative"
         >
           <ShoppingCart className="w-5 h-5" />
@@ -166,6 +170,10 @@ const Header = ({ setIsOpen }) => {
         </div>
       </header>
       <MobileNav />
+      <Cart
+        isOpen={isCartOpen}
+        onClose={handleCartClose}
+      />
     </>
   );
 };

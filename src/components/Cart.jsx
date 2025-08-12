@@ -7,7 +7,7 @@ import useSessionId from '../hooks/useSessionId';
 import { useAuth } from '../context/AuthContext';
 
 // Cart Component
-const Cart = ({ isOpen, setIsOpen, render, setRender }) => {
+const Cart = ({ isOpen, onClose }) => {
   const sessionId = useSessionId();
   const { user, isAuthenticated } = useAuth();
   const [cartItems, setCartItems] = useState([]);
@@ -18,9 +18,9 @@ const Cart = ({ isOpen, setIsOpen, render, setRender }) => {
     try {
       let data;
       if (isAuthenticated && user?.user_id) {
-        data = await getCart({donor_id: user.user_id, session_id: ''});
+        data = await getCart({ donor_id: user.user_id, session_id: '' });
       } else {
-        data = sessionId ? await getCart({session_id: sessionId, donor_id: ''}) : [];
+        data = sessionId ? await getCart({ session_id: sessionId, donor_id: '' }) : [];
       }
       setCartItems(data);
     } catch (error) {
@@ -38,7 +38,7 @@ const Cart = ({ isOpen, setIsOpen, render, setRender }) => {
 
   const updateQuantity = async (id, newQuantity) => {
     if (newQuantity < 1) return;
-    
+
     try {
       toast.loading("Updating cart...");
       await updateCart({ id, newQuantity });
@@ -67,7 +67,7 @@ const Cart = ({ isOpen, setIsOpen, render, setRender }) => {
   return (
     <CartSidebar
       isOpen={isOpen}
-      onClose={setIsOpen}
+      onClose={onClose}
       cartItems={cartItems}
       isLoading={isLoading}
       updateQuantity={updateQuantity}
@@ -97,6 +97,8 @@ const CartSidebar = ({ isOpen, onClose, cartItems, updateQuantity, onDelete, isL
   const handleCheckout = () => {
     window.location.href = '/checkout';
   };
+
+  if (!isOpen) return null;
 
   return (
     <>
@@ -180,7 +182,7 @@ const CartItem = ({ item, onUpdateQuantity, onDelete }) => {
         <h3 className="font-medium">{item.title || 'Donation Item'}</h3>
         <p className="text-sm text-gray-600">£{item.amount}</p>
       </div>
-      
+
       <div className="flex items-center space-x-2">
         <button
           onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
@@ -196,7 +198,7 @@ const CartItem = ({ item, onUpdateQuantity, onDelete }) => {
           <Plus className="w-4 h-4" />
         </button>
       </div>
-      
+
       <button
         onClick={() => onDelete(item.id)}
         className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"

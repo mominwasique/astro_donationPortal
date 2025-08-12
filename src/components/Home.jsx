@@ -130,21 +130,39 @@ const Home = () => {
   };
 
   const handleBack = () => {
-    if (step > 1) {
+    // if (step > 1) {
+    //   setStep(step - 1);
+    // }
+
+    if (step === 5) {
+      setStep(step - 1);
+      if (selectedCountry === "") {
+
+        setStep(step - 2);
+      } else {
+        setStep(step - 1);
+      }
+    } else {
       setStep(step - 1);
     }
+
   };
 
   const handleCreateCart = async () => {
     setIsLoading(true);
     try {
       const cartData = {
+        donation_period: donationPeriod,
+        currency: "GBP",
+        currency_id: 1,
         category_id: selectedCategory,
         program_id: selectedProgram,
-        country_id: selectedCountry,
-        amount: amount,
-        period: selectedPeriod,
-        program_rate_id: programRateId,
+        country_id: selectedCountry || 19,
+        // quantity: anyAmount,
+        donation_amount: amount,
+        donation_pound_amount: amount,
+        participant_name: "",
+        program_rate_id: programRateId
       };
 
       const response = await createCart(cartData);
