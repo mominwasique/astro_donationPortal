@@ -127,6 +127,16 @@ const Home = () => {
   const handleAmountSelect = async (amount, anyAmount) => {
     setAmount(amount);
     setStep(5);
+    // After selecting amount, create cart and redirect with latest values
+    await handleCreateCart({
+      amount,
+      anyAmount,
+      selectedCategory,
+      selectedProgram,
+      selectedCountry,
+      selectedPeriod,
+      programRateId
+    });
   };
 
   const handleBack = () => {
@@ -148,10 +158,16 @@ const Home = () => {
 
   };
 
-  const handleCreateCart = async () => {
+  const handleCreateCart = async ({ amount, anyAmount, selectedCategory, selectedProgram, selectedCountry, selectedPeriod, programRateId }) => {
     setIsLoading(true);
     try {
+      const searchParams = new URLSearchParams(window.location.search);
+      let sessionId = null;
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        sessionId = localStorage.getItem('sessionId');
+      }
       const cartData = {
+<<<<<<< HEAD
         donation_period: donationPeriod,
         currency: "GBP",
         currency_id: 1,
@@ -163,18 +179,45 @@ const Home = () => {
         donation_pound_amount: amount,
         participant_name: "",
         program_rate_id: programRateId
+=======
+        donation_period: selectedPeriod,
+        currency: "GBP",
+        currency_id: 1,
+        category_id: selectedCategory || Number(searchParams.get("category_id")),
+        program_id: selectedProgram || Number(searchParams.get("program_id")),
+        country_id: selectedCountry || searchParams.get("country_id") || 19,
+        quantity: (typeof anyAmount !== 'undefined' && anyAmount) ? 1 : Number(searchParams.get("quantity")) || 1,
+        donation_amount: amount,
+        donation_pound_amount: amount,
+        participant_name: "",
+        program_rate_id: programRateId || Number(searchParams.get("program_rate_id")),
+>>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
       };
+      // Add session_id or donor_id to cartData
+      if (isAuthenticated && user?.user_id) {
+        cartData.donor_id = user.user_id;
+      } else if (sessionId) {
+        cartData.session_id = sessionId;
+      }
 
+      // Store cart data in localStorage
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('cart', JSON.stringify(cartData));
+      }
+
+      console.log("Creating cart with:", cartData);
       const response = await createCart(cartData);
+      console.log("Cart created:", response);
 
-      toast.success("Cart created successfully!");
-      addToCart();
-      resetDonation();
-
+      // Add to cart context (if needed)
+      addToCart(cartData);
       // Track add_to_cart event
       trackEvent('add_to_cart', 'engagement', 'donation_cart_created', parseFloat(amount));
 
-      // Navigate to checkout
+      // Reset donation state
+      resetDonation();
+
+      // Navigate to checkout immediately after success
       window.location.href = "/checkout";
     } catch (error) {
       toast.error(`Error creating cart: ${error.message}`);
