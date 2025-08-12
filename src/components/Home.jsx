@@ -140,22 +140,17 @@ const Home = () => {
   };
 
   const handleBack = () => {
-    // if (step > 1) {
-    //   setStep(step - 1);
-    // }
-
     if (step === 5) {
-      setStep(step - 1);
       if (selectedCountry === "") {
-
-        setStep(step - 2);
+        // If no country was selected, go back to program selection (step 3)
+        setStep(3);
       } else {
-        setStep(step - 1);
+        // If country was selected, go back to country selection (step 4)
+        setStep(4);
       }
     } else {
       setStep(step - 1);
     }
-
   };
 
   const handleCreateCart = async ({ amount, anyAmount, selectedCategory, selectedProgram, selectedCountry, selectedPeriod, programRateId }) => {

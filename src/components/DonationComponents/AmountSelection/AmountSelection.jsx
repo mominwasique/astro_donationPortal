@@ -11,6 +11,8 @@ const AmountSelection = ({
   setStep,
   setProgramRateId,
   isLoading,
+  counties = [],
+
 }) => {
 
   const { selectedCategory, selectedCountry, selectedProgram } = prevData;
@@ -34,6 +36,14 @@ const AmountSelection = ({
       try {
         setProgramRateLoading(true);
         setProgramRateError(false);
+        
+        // If no country is selected, we can still proceed with amount selection
+        if (!selectedCountry) {
+          setProgramRate(null);
+          setProgramRateLoading(false);
+          return;
+        }
+        
         const result = await fetchProgramRate(selectedCategory, selectedCountry, selectedProgram);
         setProgramRate(result);
         if (result?.program_rate?.program_rate_id) {
@@ -47,7 +57,7 @@ const AmountSelection = ({
       }
     };
 
-    if (selectedCategory && selectedCountry && selectedProgram) {
+    if (selectedCategory && selectedProgram) {
       fetchProgramRateData();
     }
   }, [selectedCategory, selectedCountry, selectedProgram, setProgramRateId]);
@@ -123,6 +133,8 @@ const AmountSelection = ({
 
   const recommendedAmount = programRate?.program_rate?.program_rate;
   const allowCustom =
+    !programRate || // Allow custom when no program rate (no country selected)
+    counties.length == 0 ||
     !recommendedAmount ||
     programRate?.program_rate?.any_amount == 'Y' ||
     !programRate?.program_rate?.any_amount == 'N';
