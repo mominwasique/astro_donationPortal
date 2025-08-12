@@ -4,7 +4,7 @@ import GiftAidAndPersonalInfo from "./CheckoutPage/GiftAidAndPersonalInfo";
 import StepIndicator from "./CheckoutPage/StepIndicator";
 import { fetchCountriesList } from "../api/countiesApi";
 import { encryptData, generateReferenceId } from "../utils/functions";
-import { cartTransaction, updateParticipant } from "../api/cartApi";
+import { cartTransaction, updateParticipant, getCart } from "../api/cartApi";
 import useSessionId from "../hooks/useSessionId";
 import StripePayment from "./CheckoutPage/StripePayment";
 import { loadStripe } from "@stripe/stripe-js";
@@ -19,7 +19,9 @@ import { addNewAddress, getDonorAddress } from "../api/donationApi";
 
 const Checkout = () => {
   const { user, isAuthenticated } = useAuth();
-  const cartData = JSON.parse(localStorage.getItem('cart')) || [];
+  const sessionId = useSessionId();
+  const [cartData, setCartData] = useState([]);
+  const [isCartLoading, setIsCartLoading] = useState(true);
   const donorId = user?.user_id || JSON.parse(localStorage.getItem('user'))?.user_id;
   const [step, setStep] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -50,7 +52,69 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const stripePromise = loadStripe(import.meta.env.ASTRO_STRIPE_PUBLISH_KEY);
-  const session = useSessionId();
+
+  // Fetch cart data on component mount
+  useEffect(() => {
+    const fetchCartData = async () => {
+      try {
+        setIsCartLoading(true);
+        let data = [];
+        
+        if (isAuthenticated && user?.user_id) {
+          data = await getCart({ donor_id: user.user_id, session_id: '' });
+        } else if (sessionId) {
+          data = await getCart({ session_id: sessionId, donor_id: '' });
+        }
+        
+        // If API returns no data, try localStorage as fallback
+        if (!data || data.length === 0) {
+          const localStorageCart = localStorage.getItem('cart');
+          if (localStorageCart) {
+            try {
+              const parsedCart = JSON.parse(localStorageCart);
+              data = Array.isArray(parsedCart) ? parsedCart : [parsedCart];
+            } catch (parseError) {
+              console.error('Error parsing localStorage cart:', parseError);
+            }
+          }
+        }
+        
+        setCartData(data || []);
+        setCart(data || []);
+        
+        // Store in localStorage for backward compatibility
+        if (data && data.length > 0) {
+          localStorage.setItem('cart', JSON.stringify(data));
+        }
+      } catch (error) {
+        console.error('Error fetching cart:', error);
+        
+        // Try localStorage as fallback
+        const localStorageCart = localStorage.getItem('cart');
+        if (localStorageCart) {
+          try {
+            const parsedCart = JSON.parse(localStorageCart);
+            const fallbackData = Array.isArray(parsedCart) ? parsedCart : [parsedCart];
+            setCartData(fallbackData);
+            setCart(fallbackData);
+          } catch (parseError) {
+            console.error('Error parsing localStorage cart:', parseError);
+            setCartData([]);
+            setCart([]);
+          }
+        } else {
+          setCartData([]);
+          setCart([]);
+        }
+        
+        toast.error('Failed to load cart data from server, using cached data');
+      } finally {
+        setIsCartLoading(false);
+      }
+    };
+
+    fetchCartData();
+  }, [isAuthenticated, user?.user_id, sessionId]);
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -178,8 +242,12 @@ const Checkout = () => {
         return (
           <DonationCart
             cartData={cartData}
+            setCart={setCart}
+            participantNames={participantNames}
+            setParticipantNames={setParticipantNames}
             onNext={handleNext}
             countries={countries}
+            isLoading={isCartLoading}
           />
         );
       case 2:
@@ -251,6 +319,7 @@ const Checkout = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
+ 
         <StepIndicator currentStep={step} />
 
         <div className="mt-8">

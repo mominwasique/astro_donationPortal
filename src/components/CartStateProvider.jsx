@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HeaderWrapper from './HeaderWrapper';
 import CartWrapper from './CartWrapper';
 import HomeWrapper from './HomeWrapper';
@@ -7,12 +7,22 @@ import { Toaster } from 'react-hot-toast';
 
 const CartStateProvider = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState('');
+
+  useEffect(() => {
+    // Set current path after component mounts to avoid hydration mismatch
+    if (typeof window !== 'undefined') {
+      setCurrentPath(window.location.pathname);
+    }
+  }, []);
+
+  const isCheckoutPage = currentPath === '/checkout';
 
   return (
     <>
       <CartWrapper isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
       <HeaderWrapper setIsOpen={setIsCartOpen} />
-      <HomeWrapper />
+      {!isCheckoutPage && <HomeWrapper />}
       <CartAnimation />
       <Toaster
         position="top-center"

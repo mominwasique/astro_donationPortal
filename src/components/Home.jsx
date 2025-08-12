@@ -189,7 +189,8 @@ const Home = () => {
 
       // Store cart data in localStorage
       if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-        localStorage.setItem('cart', JSON.stringify(cartData));
+        // Store as array to match checkout page expectations
+        localStorage.setItem('cart', JSON.stringify([cartData]));
       }
 
       console.log("Creating cart with:", cartData);
@@ -220,6 +221,7 @@ const Home = () => {
           <DonationPeriodSelection
             selectedPeriod={selectedPeriod}
             onSelect={handlePeriodSelect}
+            setStep={setStep}
           />
         );
       case 2:

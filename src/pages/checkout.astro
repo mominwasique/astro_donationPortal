@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import HeaderWrapper from '../components/HeaderWrapper.jsx';
-import CartWrapper from '../components/CartWrapper.jsx';
+import CartStateProvider from '../components/CartStateProvider.jsx';
 import CheckoutWrapper from '../components/CheckoutWrapper.jsx';
 import { CartProvider } from '../context/CartContext.jsx';
 import { Toaster } from 'react-hot-toast';
@@ -9,8 +8,7 @@ import { Toaster } from 'react-hot-toast';
 
 <Layout title="Checkout - BMM Donation Portal">
   <CartProvider client:load>
-    <CartWrapper client:load />
-    <HeaderWrapper client:load />
+    <CartStateProvider client:load />
     <CheckoutWrapper client:load />
     <Toaster
       position="top-center"

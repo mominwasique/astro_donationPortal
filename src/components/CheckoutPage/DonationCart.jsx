@@ -4,10 +4,10 @@ import { deleteFromCart, getCart, updateCart } from "../../api/cartApi";
 import useSessionId from "../../hooks/useSessionId";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
-import { ShoppingCart, AlertCircle, Loader2, ChevronRight, Info, User, Users } from "lucide-react";
+import { ShoppingCart, AlertCircle, Loader2, ChevronRight, Info, User, Users, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 
-const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }) => {
+const DonationCart = ({ cartData, setCart, participantNames, setParticipantNames, onNext, isLoading }) => {
   const sessionId = useSessionId();
   const { user, isAuthenticated } = useAuth();
   const [selfDonateItems, setSelfDonateItems] = useState({});
@@ -15,39 +15,31 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
   const [applyToAllItems, setApplyToAllItems] = useState(false);
 
   const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
+  // Use cartData from props instead of fetching internally
   useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        setIsLoading(true);
-        setIsError(false);
-        let cartData;
-        if (isAuthenticated && user?.user_id) {
-          cartData = await getCart({ donor_id: user.user_id, session_id: '' });
-        } else if (sessionId) {
-          cartData = await getCart({ session_id: sessionId, donor_id: '' });
-        } else {
-          cartData = [];
-        }
-        setData(cartData);
-      } catch (error) {
-        setIsError(true);
-        console.error('Error fetching cart:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCart();
-  }, [isAuthenticated, user?.user_id, sessionId]);
+    console.log('DonationCart received cartData:', cartData);
+    console.log('DonationCart isLoading:', isLoading);
+    
+    if (cartData && Array.isArray(cartData)) {
+      console.log('Setting cart data in DonationCart:', cartData);
+      setData(cartData);
+      setIsError(false);
+    } else {
+      console.log('No valid cart data, setting empty array');
+      setData([]);
+      setIsError(true);
+    }
+  }, [cartData, isLoading]);
 
   // Update cart in localStorage and parent component
   useEffect(() => {
     if (data.length > 0) {
       localStorage.setItem("cart", JSON.stringify(data));
-      setCart(data);
+      if (setCart) {
+        setCart(data);
+      }
     }
   }, [data, setCart]);
 
@@ -70,7 +62,7 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
       setParticipantNames(initialNames);
       setSelfDonateItems(initialSelfDonate);
     }
-  }, [data, isAuthenticated, user?.first_name]);
+  }, [data, isAuthenticated, user?.first_name, setParticipantNames]);
 
   const handleParticipantNameChange = useCallback((itemId, index, value) => {
     setParticipantNames((prev) => {
@@ -81,7 +73,7 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
       updated[itemId][index] = value;
       return updated;
     });
-  }, []);
+  }, [setParticipantNames]);
 
   // New function to apply guest name to all participant fields
   const applyGuestNameToAll = useCallback(() => {
@@ -122,7 +114,7 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
     }
 
     toast.success("Name applied successfully!");
-  }, [guestName, applyToAllItems, data]);
+  }, [guestName, applyToAllItems, data, setParticipantNames]);
 
   const updateQuantity = useCallback(async (id, newQuantity) => {
     if (newQuantity < 1) return;
@@ -163,7 +155,7 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
       updated[id] = Array(totalParticipants).fill("");
       return updated;
     });
-  }, [data, isAuthenticated, user?.user_id, sessionId]);
+  }, [data, isAuthenticated, user?.user_id, sessionId, setParticipantNames]);
 
   const removeItem = useCallback(async (cartId) => {
     try {
@@ -199,9 +191,7 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
       delete updated[cartId];
       return updated;
     });
-  }, [isAuthenticated, user?.user_id, sessionId]);
-
-
+  }, [isAuthenticated, user?.user_id, sessionId, setParticipantNames]);
 
   const getTotalAmount = useCallback(() => {
     return data.reduce((sum, item) => sum + item.donation_amount * item.quantity, 0);
@@ -405,7 +395,6 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
             className="border border-primary rounded-lg p-4  transition-colors hover:shadow-sm"
           >
             <ItemCard
-              isLoading={quantityMutation.isPending || deleteMutation.isPending}
               item={item}
               updateQuantity={updateQuantity}
               removeItem={removeItem}
@@ -525,6 +514,40 @@ const DonationCart = ({ setCart, participantNames, setParticipantNames, onNext }
           </p>
         </div>
       )}
+
+      {/* Navigation Buttons */}
+      <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        {/* Previous Button */}
+        <button
+          onClick={() => window.location.href = "/"}
+          className="px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200"
+        >
+          <span>← Back to Programs</span>
+        </button>
+
+        {/* Add More Programs Button */}
+        <button
+          onClick={() => window.location.href = "/"}
+          className="px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 bg-secondary text-white hover:bg-secondary/90"
+        >
+          <span>Add More Programs</span>
+          <Plus className="w-4 h-4" />
+        </button>
+
+        {/* Next Button */}
+        <button
+          onClick={onNext}
+          disabled={data.length === 0 || (data.some(item => item.participant_required === "Y") && !areAllParticipantNamesFilled())}
+          className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+            data.length === 0 || (data.some(item => item.participant_required === "Y") && !areAllParticipantNamesFilled())
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-primary text-white hover:bg-primary/90'
+          }`}
+        >
+          <span>Continue to Personal Information</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
     </motion.div>
   );
 };

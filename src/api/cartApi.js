@@ -18,9 +18,24 @@ export const createCart = async cartData => {
 };
 
 export const getCart = async data => {
-  const res = await api.post('/cart/cart', data);
-
-  return res.data.cart;
+  try {
+    const res = await api.post('/cart/cart', data);
+    
+    // Handle different response structures
+    if (res.data && res.data.cart) {
+      return res.data.cart;
+    } else if (res.data && Array.isArray(res.data)) {
+      return res.data;
+    } else if (res.data && res.data.data && Array.isArray(res.data.data)) {
+      return res.data.data;
+    } else {
+      console.warn('Unexpected cart response structure:', res.data);
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    throw error;
+  }
 };
 
 export const updateCart = async data => {

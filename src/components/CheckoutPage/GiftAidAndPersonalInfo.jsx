@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Mail, Phone, MessageSquare, Mailbox, Info, AlertCircle, Check } from "lucide-react";
+import { Mail, Phone, MessageSquare, Mailbox, Info, AlertCircle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchCities } from "../../api/citiesApi.js";
 import { getDonorAddress, getDonorInfo } from "../../api/donationApi";
 import { useAuth } from "../../context/AuthContext";
@@ -7,7 +7,7 @@ import { titleOptions } from "../../utils/data";
 import { FindAddressPopup } from "./FindAddressPopup";
 import { formatSortCode } from "../../api/cartApi.js";
 
-const GiftAidAndPersonalInfo = ({ donation, setDonation, countries, paymentGateway, setPaymentGateway, submitted, addressData, preferences, setPreferences }) => {
+const GiftAidAndPersonalInfo = ({ donation, setDonation, countries, paymentGateway, setPaymentGateway, submitted, addressData, preferences, setPreferences, onNext, onPrevious }) => {
     const { user, isAuthenticated } = useAuth();
     const [showPopup, setShowPopup] = useState(false);
     const [errors, setErrors] = useState({});
@@ -775,6 +775,27 @@ const GiftAidAndPersonalInfo = ({ donation, setDonation, countries, paymentGatew
                 <p className="mt-1">
                     For any questions or to update your preferences, contact <span className="text-secondary hover:text-primary font-bold cursor-pointer transition-colors duration-200">{import.meta.env.ASTRO_CONTACT_MAIL}</span>
                 </p>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                {/* Previous Button */}
+                <button
+                    onClick={onPrevious}
+                    className="px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200"
+                >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Back to Cart</span>
+                </button>
+
+                {/* Next Button */}
+                <button
+                    onClick={onNext}
+                    className="px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 bg-primary text-white hover:bg-primary/90"
+                >
+                    <span>Continue to Payment</span>
+                    <ChevronRight className="w-4 h-4" />
+                </button>
             </div>
         </div>
 
