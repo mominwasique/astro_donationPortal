@@ -1,5 +1,5 @@
 export const API_BASE_URL = import.meta.env.ASTRO_API_BASE_URL || 'http://localhost:3000/api';
-export const STRIPE_PUBLIC_KEY = import.meta.env.ASTRO_STRIPE_PUBLIC_KEY;
+export const STRIPE_PUBLIC_KEY = import.meta.env.ASTRO_STRIPE_PUBLIC_KEY || 'pk_test_51OpqyISCpAlqBVLzSBLMsm0w76Fvs0TkHkitCp7c5KFFk0DxPpVyU7do8eAJyi2SR4QAFnhNyphoteu9Yd16qswN00dQN0O2Jq';
 export const PAYPAL_CLIENT_ID = import.meta.env.ASTRO_PAYPAL_CLIENT_ID;
 
 export const ROUTES = {
