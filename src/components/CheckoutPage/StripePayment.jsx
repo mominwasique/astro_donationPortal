@@ -44,7 +44,13 @@ const PaymentForm = ({
   setIsPaymentGatewayOpen,
   isPaymentGatewayOpen,
   reference_no,
+  personalInfo,
 }) => {
+  // Add null check
+  if (!personalInfo) {
+    return <div>Loading...</div>;
+  }
+
   const userData = JSON.parse(localStorage.getItem('userData'));
 
   const stripe = useStripe();

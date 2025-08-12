@@ -16,7 +16,7 @@ import { useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, ShoppingBag, CreditCard, User, Loader2 } from "lucide-react";
 import { addNewAddress, getDonorAddress } from "../api/donationApi";
-
+import ErrorBoundary from "./ErrorBoundary";
 const Checkout = () => {
   const { user, isAuthenticated } = useAuth();
   const sessionId = useSessionId();
@@ -51,7 +51,7 @@ const Checkout = () => {
   const [addressData, setAddressData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const stripePromise = loadStripe(import.meta.env.ASTRO_STRIPE_PUBLISH_KEY);
+  const stripePromise = loadStripe('pk_test_51OpqyISCpAlqBVLzSBLMsm0w76Fvs0TkHkitCp7c5KFFk0DxPpVyU7do8eAJyi2SR4QAFnhNyphoteu9Yd16qswN00dQN0O2Jq');
 
   // Fetch cart data on component mount
   useEffect(() => {
@@ -59,13 +59,13 @@ const Checkout = () => {
       try {
         setIsCartLoading(true);
         let data = [];
-        
+
         if (isAuthenticated && user?.user_id) {
           data = await getCart({ donor_id: user.user_id, session_id: '' });
         } else if (sessionId) {
           data = await getCart({ session_id: sessionId, donor_id: '' });
         }
-        
+
         // If API returns no data, try localStorage as fallback
         if (!data || data.length === 0) {
           const localStorageCart = localStorage.getItem('cart');
@@ -78,17 +78,17 @@ const Checkout = () => {
             }
           }
         }
-        
+
         setCartData(data || []);
         setCart(data || []);
-        
+
         // Store in localStorage for backward compatibility
         if (data && data.length > 0) {
           localStorage.setItem('cart', JSON.stringify(data));
         }
       } catch (error) {
         console.error('Error fetching cart:', error);
-        
+
         // Try localStorage as fallback
         const localStorageCart = localStorage.getItem('cart');
         if (localStorageCart) {
@@ -106,7 +106,7 @@ const Checkout = () => {
           setCartData([]);
           setCart([]);
         }
-        
+
         toast.error('Failed to load cart data from server, using cached data');
       } finally {
         setIsCartLoading(false);
@@ -266,6 +266,21 @@ const Checkout = () => {
           />
         );
       case 3:
+        if (!donation?.personalInfo || !cartData?.length) {
+          return (
+            <div className="text-center py-4">
+              <p className="text-red-600">Missing required information. Please go back and fill in all required fields.</p>
+              <button
+                onClick={handlePrevious}
+                className="mt-4 flex items-center space-x-2 text-gray-600 hover:text-gray-800"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -290,10 +305,34 @@ const Checkout = () => {
               </button>
             </div>
 
+            <ErrorBoundary>
+              {paymentGateway === "stripe" ? (
+                <Elements stripe={stripePromise}>
+                  <StripePayment
+                    cartData={cartData}
+                    donation={donation}
+                    personalInfo={donation.personalInfo}
+                    preferences={preferences}
+                    participantNames={participantNames}
+                    reference_no={reference_no}
+                  />
+                </Elements>
+              ) : (
+                <PayPalPayment
+                  cartData={cartData}
+                  donation={donation}
+                  personalInfo={donation.personalInfo}
+                  preferences={preferences}
+                  participantNames={participantNames}
+                  reference_no={reference_no}
+                />
+              )}
+            </ErrorBoundary>
             {paymentGateway === "stripe" ? (
               <Elements stripe={stripePromise}>
                 <StripePayment
                   cartData={cartData}
+                  donation={donation}
                   personalInfo={donation.personalInfo}
                   preferences={preferences}
                   participantNames={participantNames}
@@ -303,6 +342,7 @@ const Checkout = () => {
             ) : (
               <PayPalPayment
                 cartData={cartData}
+                donation={donation}
                 personalInfo={donation.personalInfo}
                 preferences={preferences}
                 participantNames={participantNames}
@@ -319,7 +359,7 @@ const Checkout = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
- 
+
         <StepIndicator currentStep={step} />
 
         <div className="mt-8">
