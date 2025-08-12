@@ -167,19 +167,7 @@ const Home = () => {
         sessionId = localStorage.getItem('sessionId');
       }
       const cartData = {
-<<<<<<< HEAD
-        donation_period: donationPeriod,
-        currency: "GBP",
-        currency_id: 1,
-        category_id: selectedCategory,
-        program_id: selectedProgram,
-        country_id: selectedCountry || 19,
-        // quantity: anyAmount,
-        donation_amount: amount,
-        donation_pound_amount: amount,
-        participant_name: "",
-        program_rate_id: programRateId
-=======
+
         donation_period: selectedPeriod,
         currency: "GBP",
         currency_id: 1,
@@ -191,7 +179,6 @@ const Home = () => {
         donation_pound_amount: amount,
         participant_name: "",
         program_rate_id: programRateId || Number(searchParams.get("program_rate_id")),
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
       };
       // Add session_id or donor_id to cartData
       if (isAuthenticated && user?.user_id) {

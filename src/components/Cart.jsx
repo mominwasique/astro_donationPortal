@@ -7,11 +7,7 @@ import useSessionId from '../hooks/useSessionId';
 import { useAuth } from '../context/AuthContext';
 
 // Cart Component
-<<<<<<< HEAD
-const Cart = ({ isOpen, onClose }) => {
-=======
 const Cart = ({ isOpen, setIsOpen, render, setRender, websiteUrl }) => {
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
   const sessionId = useSessionId();
   const { user, isAuthenticated } = useAuth();
   
@@ -32,10 +28,6 @@ const Cart = ({ isOpen, setIsOpen, render, setRender, websiteUrl }) => {
       
       if (isAuthenticated && user?.user_id) {
         data = await getCart({ donor_id: user.user_id, session_id: '' });
-<<<<<<< HEAD
-      } else {
-        data = sessionId ? await getCart({ session_id: sessionId, donor_id: '' }) : [];
-=======
       } else if (sessionId) {
         data = await getCart({ session_id: sessionId, donor_id: '' });
       }
@@ -45,7 +37,6 @@ const Cart = ({ isOpen, setIsOpen, render, setRender, websiteUrl }) => {
       // Trigger render update if setRender is provided
       if (setRender) {
         setRender(prev => !prev);
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
       }
     } catch (error) {
       console.error('Error fetching cart:', error);
@@ -83,15 +74,10 @@ const Cart = ({ isOpen, setIsOpen, render, setRender, websiteUrl }) => {
 
   // Update quantity handler
   const updateQuantity = async (id, newQuantity) => {
-<<<<<<< HEAD
-    if (newQuantity < 1) return;
-
-=======
     if (newQuantity < 1 || isUpdating) return;
 
     setIsUpdating(true);
     
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
     try {
       toast.loading("Updating cart...");
       
@@ -164,12 +150,8 @@ const Cart = ({ isOpen, setIsOpen, render, setRender, websiteUrl }) => {
   return (
     <CartSidebar
       isOpen={isOpen}
-<<<<<<< HEAD
-      onClose={onClose}
-=======
       onClose={handleCloseCart}
       setIsOpen={setIsOpen}
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
       cartItems={cartItems}
       isLoading={isLoading}
       isError={isError}
@@ -244,9 +226,6 @@ const CartSidebar = ({
     window.location.href = "/checkout";
   };
 
-<<<<<<< HEAD
-  if (!isOpen) return null;
-=======
   // Handle add more programs
   const handleAddMorePrograms = () => {
     if (websiteUrl) {
@@ -299,7 +278,6 @@ const CartSidebar = ({
       </>
     );
   }
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
 
   return (
     <>
@@ -469,34 +447,7 @@ const CartItem = ({ item, updateQuantity, onDelete, isUpdating, isDeleting }) =>
           </button>
         </div>
       </div>
-<<<<<<< HEAD
-
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-          className="p-1 hover:bg-gray-100 rounded"
-        >
-          <Minus className="w-4 h-4" />
-        </button>
-        <span className="w-8 text-center">{item.quantity}</span>
-        <button
-          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-          className="p-1 hover:bg-gray-100 rounded"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-      </div>
-
-      <button
-        onClick={() => onDelete(item.id)}
-        className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
-    </div>
-=======
     </motion.div>
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
   );
 };
 

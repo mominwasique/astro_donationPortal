@@ -3,22 +3,13 @@ import useSessionId from '../hooks/useSessionId';
 import { LogIn, UserPlus, ShoppingCart, User, LogOut, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getCart } from '../api/cartApi';
-import Cart from './Cart'; // Import the Cart component
 
-<<<<<<< HEAD
-const Header = () => {
-=======
 const Header = ({ setIsOpen, cartItems, refreshTrigger }) => {
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
   const { user, logout, isAuthenticated } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const sessionId = useSessionId();
   const [currentPath, setCurrentPath] = useState('');
-<<<<<<< HEAD
-  const [isCartOpen, setIsCartOpen] = useState(false); // Add this state
-=======
   const [isLoading, setIsLoading] = useState(false);
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
 
   useEffect(() => {
     // Set current path after component mounts to avoid hydration mismatch
@@ -105,12 +96,6 @@ const Header = ({ setIsOpen, cartItems, refreshTrigger }) => {
 
   const handleCartClick = (e) => {
     e.preventDefault();
-<<<<<<< HEAD
-    setIsCartOpen(true);
-  };
-
-  const handleCartClose = () => setIsCartOpen(false); // Close cart handler
-=======
     console.log('Cart clicked');
     setIsOpen(true);
   };
@@ -120,7 +105,6 @@ const Header = ({ setIsOpen, cartItems, refreshTrigger }) => {
       window.location.href = path;
     }
   };
->>>>>>> b054ba9c3aad55c7531b61e2f97d79f8d91154eb
 
   const MobileNav = () => (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] border-t border-gray-200 py-4 px-6 z-40">
@@ -267,10 +251,6 @@ const Header = ({ setIsOpen, cartItems, refreshTrigger }) => {
         </div>
       </header>
       <MobileNav />
-      <Cart
-        isOpen={isCartOpen}
-        onClose={handleCartClose}
-      />
     </>
   );
 };
