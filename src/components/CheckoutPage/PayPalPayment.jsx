@@ -71,7 +71,7 @@ const PayPalPayment = ({ reference_no, onSuccess }) => {
   return (
     <PayPalScriptProvider
       options={{
-        "client-id": import.meta.env.ASTRO_PAYPAL_CLIENT_ID,
+        "client-id": import.meta.env.PUBLIC_PAYPAL_CLIENT_ID,
         currency: "GBP",
       }}
     >

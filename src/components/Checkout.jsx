@@ -141,8 +141,50 @@ const Checkout = () => {
     loadAddressData();
   }, [donorId]);
 
-  const handleNext = () => {
-    if (step < 3) {
+  const handleNext = async () => {
+    if (step === 2) {
+      // Validate required fields before proceeding to payment
+      const missingFields = requiredFields.filter(field => !donation.personalInfo[field]);
+      if (missingFields.length > 0) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        // Generate reference number if not exists
+        if (!reference_no) {
+          const newReferenceNo = generateReferenceId();
+          setReference_no(newReferenceNo);
+        }
+
+        // Create transaction first
+        const transactionData = {
+          cart_id: cartData[0]?.cart_id,
+          donor_id: donorId,
+          personal_info: donation.personalInfo,
+          preferences: preferences,
+          participant_names: participantNames,
+          reference_no: reference_no,
+        };
+
+        const response = await cartTransaction(transactionData);
+
+        if (response.message === "Cart transaction has been created successfully") {
+          setIsPaymentGatewayOpen(true);
+          // Proceed to next step which will trigger Stripe
+          setStep(3);
+        } else {
+          toast.error(response.message || 'Transaction failed');
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        toast.error('Error processing payment');
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (step < 3) {
+      // Normal step progression for steps before payment
       setIsAnimating(true);
       setTimeout(() => {
         setStep(step + 1);
@@ -266,90 +308,19 @@ const Checkout = () => {
           />
         );
       case 3:
-        if (!donation?.personalInfo || !cartData?.length) {
-          return (
-            <div className="text-center py-4">
-              <p className="text-red-600">Missing required information. Please go back and fill in all required fields.</p>
-              <button
-                onClick={handlePrevious}
-                className="mt-4 flex items-center space-x-2 text-gray-600 hover:text-gray-800"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-            </div>
-          );
-        }
-
         return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <button
-                onClick={handlePrevious}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowRight className="w-4 h-4" />
-                )}
-                <span>Complete Payment</span>
-              </button>
-            </div>
-
-            <ErrorBoundary>
-              {paymentGateway === "stripe" ? (
-                <Elements stripe={stripePromise}>
-                  <StripePayment
-                    cartData={cartData}
-                    donation={donation}
-                    personalInfo={donation.personalInfo}
-                    preferences={preferences}
-                    participantNames={participantNames}
-                    reference_no={reference_no}
-                  />
-                </Elements>
-              ) : (
-                <PayPalPayment
-                  cartData={cartData}
-                  donation={donation}
-                  personalInfo={donation.personalInfo}
-                  preferences={preferences}
-                  participantNames={participantNames}
-                  reference_no={reference_no}
-                />
-              )}
-            </ErrorBoundary>
-            {paymentGateway === "stripe" ? (
-              <Elements stripe={stripePromise}>
-                <StripePayment
-                  cartData={cartData}
-                  donation={donation}
-                  personalInfo={donation.personalInfo}
-                  preferences={preferences}
-                  participantNames={participantNames}
-                  reference_no={reference_no}
-                />
-              </Elements>
-            ) : (
-              <PayPalPayment
-                cartData={cartData}
-                donation={donation}
-                personalInfo={donation.personalInfo}
-                preferences={preferences}
-                participantNames={participantNames}
-                reference_no={reference_no}
-              />
-            )}
-          </div>
+          <Elements stripe={stripePromise}>
+            <StripePayment
+              cartData={cartData}
+              donation={donation}
+              setIsPaymentGatewayOpen={setIsPaymentGatewayOpen}
+              isPaymentGatewayOpen={isPaymentGatewayOpen}
+              personalInfo={donation.personalInfo}
+              preferences={preferences}
+              participantNames={participantNames}
+              reference_no={reference_no}
+            />
+          </Elements>
         );
       default:
         return null;

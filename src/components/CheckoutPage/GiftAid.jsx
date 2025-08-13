@@ -166,7 +166,7 @@ const CompactGiftAid = ({ preferences, setPreferences }) => {
           <span className="font-medium text-secondary">Communication:</span> We protect your data and only contact you according to your preferences. See our Privacy Policy for details.
         </p>
         <p className="mt-1">
-          For any questions or to update your preferences, contact <span className="text-secondary hover:text-primary cursor-pointer transition-colors duration-200">{import.meta.env.ASTRO_CONTACT_MAIL}</span>
+          For any questions or to update your preferences, contact <span className="text-secondary hover:text-primary cursor-pointer transition-colors duration-200">{import.meta.env.PUBLIC_CONTACT_MAIL}</span>
 
         </p>
       </div>

@@ -55,15 +55,15 @@ const PaymentForm = ({
 
   const stripe = useStripe();
   const elements = useElements();
-  const [email, setEmail] = useState(userData.personalInfo.email);
+  const [email, setEmail] = useState(userData?.personalInfo?.email);
   const [name, setName] = useState(
-    `${userData.personalInfo.firstName} ${userData.personalInfo.lastName}`
+    `${userData?.personalInfo?.firstName} ${userData?.personalInfo?.lastName}`
   );
   const [address, setAddress] = useState({
-    line1: userData.personalInfo.address1,
-    line2: userData.personalInfo.address2,
-    city: userData.personalInfo.city,
-    postalCode: userData.personalInfo.postcode,
+    line1: userData?.personalInfo?.address1,
+    line2: userData?.personalInfo?.address2,
+    city: userData?.personalInfo?.city,
+    postalCode: userData?.personalInfo?.postcode,
     country: 'GB', // Default country code for United Kingdom
   });
   const [error, setError] = useState(null);

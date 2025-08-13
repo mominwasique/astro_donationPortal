@@ -349,8 +349,8 @@ const FundraiserPreviewModal = ({ fundraiser, isOpen, onClose, onPublishSuccess 
                     <button
                         className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors font-medium text-sm flex items-center"
                         onClick={() => {
-                            window.open(`${import.meta.env.ASTRO_WEBSITE_URL}/fundraiser/${fundraiser.slug_url}`, '_blank');
-                            toast.success(`${import.meta.env.ASTRO_WEBSITE_URL}/fundraiser/${fundraiser.slug_url}`, '_blank')
+                            window.open(`${import.meta.env.PUBLIC_WEBSITE_URL}/fundraiser/${fundraiser.slug_url}`, '_blank');
+                            toast.success(`${import.meta.env.PUBLIC_WEBSITE_URL}/fundraiser/${fundraiser.slug_url}`, '_blank')
                         }}
                     >
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

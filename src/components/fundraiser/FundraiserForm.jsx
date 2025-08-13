@@ -126,10 +126,10 @@ const FundraiserForm = ({ fundraiser = null, onClose, onSuccess }) => {
                 : '/add-fundraiser';
             const method = isEditing ? 'POST' : 'POST'; // Use POST for both, or PUT for edit if backend supports
 
-            const response = await fetch(import.meta.env.ASTRO_API_BASE_URL + url, {
+            const response = await fetch(import.meta.env.PUBLIC_API_BASE_URL + url, {
                 method,
                 headers: {
-                    'Authorization': `Bearer ${import.meta.env.ASTRO_API_TOKEN}`,
+                    'Authorization': `Bearer ${import.meta.env.PUBLIC_API_TOKEN}`,
                 },
                 body: payload,
             });

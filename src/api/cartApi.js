@@ -20,7 +20,7 @@ export const createCart = async cartData => {
 export const getCart = async data => {
   try {
     const res = await api.post('/cart/cart', data);
-    
+
     // Handle different response structures
     if (res.data && res.data.cart) {
       return res.data.cart;
@@ -61,18 +61,18 @@ export const updateParticipant = async data => {
 
 export const cartTransaction = async data => {
   const guest_details = {
-    title: data.personalInfo.title,
-    first_name: data.personalInfo.firstName,
-    last_name: data.personalInfo.lastName,
-    phone: data.personalInfo.phone,
-    email: data.personalInfo.email,
-    address1: data.personalInfo.address1,
-    address2: data.personalInfo.address2,
-    postcode: data.personalInfo.postcode,
+    title: data?.personalInfo?.title,
+    first_name: data?.personalInfo?.firstName,
+    last_name: data?.personalInfo?.lastName,
+    phone: data?.personalInfo?.phone,
+    email: data?.personalInfo?.email,
+    address1: data?.personalInfo?.address1,
+    address2: data?.personalInfo?.address2,
+    postcode: data?.personalInfo?.postcode,
     // city: data.personalInfo.city,
-    city_id: data.personalInfo.city_id || 'sample',
-    country: data.personalInfo.country,
-    city_name: data.personalInfo.city,
+    city_id: data?.personalInfo?.city_id || 'sample',
+    country: data?.personalInfo?.country,
+    city_name: data?.personalInfo?.city,
     payment_gateway: 'stripe',
   };
 
@@ -90,7 +90,7 @@ export const cartTransaction = async data => {
   }
   form_Data.append('reference_no', data.referenceId);
   form_Data.append('payment_method', '');
-  form_Data.append('is_giftaid', (data.personalInfo.country !== '1' ? 'O' : (data.giftAid ? 'Y' : 'N')));
+  form_Data.append('is_giftaid', (data?.personalInfo?.country !== '1' ? 'O' : (data.giftAid ? 'Y' : 'N')));
   form_Data.append('tele_calling', data.phone ? 'Y' : 'N');
   form_Data.append('send_email', data.email ? 'Y' : 'N');
   form_Data.append('send_mail', data.post ? 'Y' : 'N');
@@ -98,9 +98,9 @@ export const cartTransaction = async data => {
 
   // Format bank sort code with hyphens
 
-  form_Data.append('bank_sort_code', formatSortCode(data.personalInfo.bank_sort_code));
-  form_Data.append('bank_ac_no', data.personalInfo.bank_ac_no);
-  form_Data.append('dd_run', data.personalInfo.dd_run);
+  form_Data.append('bank_sort_code', formatSortCode(data?.personalInfo?.bank_sort_code));
+  form_Data.append('bank_ac_no', data?.personalInfo?.bank_ac_no);
+  form_Data.append('dd_run', data?.personalInfo?.dd_run);
   form_Data.append('payment_gateway', 'stripe');
   form_Data.append('paywith', 'stripe');
   form_Data.append('payment_method', 'stripe');
@@ -136,11 +136,11 @@ export const cartTransaction = async data => {
     // const response = await api.post(`payment/transaction`, form_Data);
 
     const response = await axios.post(
-      `${import.meta.env.ASTRO_API_BASE_URL}/payment/transaction`,
+      `${import.meta.env.PUBLIC_API_BASE_URL}/payment/transaction`,
       form_Data,
       {
         headers: {
-          Authorization: `Bearer ${import.meta.env.ASTRO_API_TOKEN}`,
+          Authorization: `Bearer ${import.meta.env.PUBLIC_API_TOKEN}`,
           'Content-Type': 'multipart/form-data',
         },
       }
